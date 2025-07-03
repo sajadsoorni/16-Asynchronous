@@ -30,6 +30,7 @@ const renderCountry = function (data, className = '') {
   countriesContainer.style.opacity = 1;
 };
 
+/*
 const getCountryAndNeighbour = function (country) {
   // Ajax call country 1
   const request = new XMLHttpRequest();
@@ -77,3 +78,11 @@ setTimeout(() => {
     }, 1000);
   }, 1000);
 }, 1000);
+*/
+
+// const request = new XMLHttpRequest();
+// request.open('GET', `https://restcountries.com/v2/name/${country}`);
+// request.send();
+
+const request = fetch(`https://restcountries.com/v2/name/portugal`);
+console.log(request);
