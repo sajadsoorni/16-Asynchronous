@@ -23,7 +23,7 @@ const renderCountry = function (data, className = '') {
 
 const renderError = function (msg) {
   countriesContainer.insertAdjacentText('beforeend', msg);
-  // countriesContainer.style.opacity = 1;
+  countriesContainer.style.opacity = 1;
 };
 
 // NEW COUNTRIES API URL (use instead of the URL shown in videos):
@@ -429,23 +429,33 @@ const getPosition = function () {
 };
 
 const whereAmI = async function (country) {
-  // Geolocation
-  const pos = await getPosition();
-  const { latitude: lat, longitude: lng } = pos.coords;
-  // Reverse geocoding
-  const resGeo =
-    await fetch(`https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${lat}&longitude=${lng}
+  try {
+    // Geolocation
+    const pos = await getPosition();
+    const { latitude: lat, longitude: lng } = pos.coords;
+    // Reverse geocoding
+    const resGeo =
+      await fetch(`https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${lat}&longitude=${lng}
   `);
-  const dataGeo = await resGeo.json();
-  console.log(dataGeo);
-  // Country data
-  const res = await fetch(
-    `https://restcountries.com/v2/name/${dataGeo.countryCode}`
-  );
-  const data = await res.json();
-  console.log(data);
-  renderCountry(data[0]);
+    if (!resGeo.ok) {
+      throw new Error('Problem getting location data');
+    }
+    const dataGeo = await resGeo.json();
+    console.log(dataGeo);
+    // Country data
+    const res = await fetch(
+      `https://restcountries.com/v2/name/${dataGeo.countryCode}`
+    );
+    const data = await res.json();
+    console.log(data);
+    if (data.status === 404) throw new Error('Country not found!');
+    renderCountry(data[0]);
+  } catch (err) {
+    console.error(`${err} 💥`);
+    renderError(`💥 ${err.message}`);
+  }
 };
 
-whereAmI('portugal');
+whereAmI();
+
 console.log('FIRST');
