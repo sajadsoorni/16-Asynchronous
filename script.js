@@ -371,7 +371,6 @@ TEST DATA: Images in the img folder. Test the error handler by passing a wrong i
 Set the network speed to 'Fast 3G' in the dev tools Network tab, otherwise images load too fast.
 
 GOOD LUCK 😀
-*/
 const wait = function (seconds) {
   return new Promise(function (resolve) {
     setTimeout(resolve, seconds * 1000);
@@ -384,12 +383,12 @@ const createImage = function (imgPath) {
   return new Promise(function (resolve, reject) {
     const img = document.createElement('img');
     img.src = imgPath;
-
+    
     img.addEventListener('load', function () {
       imgContainer.append(img);
       resolve(img);
     });
-
+    
     img.addEventListener('error', function () {
       reject(new Error('Image not found!'));
     });
@@ -398,21 +397,55 @@ const createImage = function (imgPath) {
 
 let currentImg;
 createImage('img/img-1.jpg')
-  .then(img => {
-    currentImg = img;
-    console.log('Image 1 loaded');
-    return wait(2);
-  })
-  .then(() => {
-    currentImg.style.display = 'none';
-    return createImage('img/img-2.jpg');
-  })
-  .then(img => {
-    currentImg = img;
-    console.log('Image 2 loaded');
-    return wait(2);
-  })
-  .then(() => {
-    currentImg.style.display = 'none';
-  })
-  .catch(err => console.error(err));
+.then(img => {
+  currentImg = img;
+  console.log('Image 1 loaded');
+  return wait(2);
+})
+.then(() => {
+  currentImg.style.display = 'none';
+  return createImage('img/img-2.jpg');
+})
+.then(img => {
+  currentImg = img;
+  console.log('Image 2 loaded');
+  return wait(2);
+})
+.then(() => {
+  currentImg.style.display = 'none';
+})
+.catch(err => console.error(err));
+
+*/
+
+// fetch(`https://restcountries.com/v2/name/${country}`).then(res =>
+//   console.log(res)
+// );
+
+const getPosition = function () {
+  return new Promise(function (resolve, reject) {
+    navigator.geolocation.getCurrentPosition(resolve, reject);
+  });
+};
+
+const whereAmI = async function (country) {
+  // Geolocation
+  const pos = await getPosition();
+  const { latitude: lat, longitude: lng } = pos.coords;
+  // Reverse geocoding
+  const resGeo =
+    await fetch(`https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${lat}&longitude=${lng}
+  `);
+  const dataGeo = await resGeo.json();
+  console.log(dataGeo);
+  // Country data
+  const res = await fetch(
+    `https://restcountries.com/v2/name/${dataGeo.countryCode}`
+  );
+  const data = await res.json();
+  console.log(data);
+  renderCountry(data[0]);
+};
+
+whereAmI('portugal');
+console.log('FIRST');
